@@ -47,3 +47,38 @@ const menuOptions = [
       choices: menuOptions,
     },
   ];
+
+  const addRoleQuestions = [
+    { type: "input", name: "name", message: "What is role name?" },
+    { type: "input", name: "salary", message: "What is role salary?" },
+    {
+      type: "list",
+      name: "department_id",
+      message: "Which department?",
+      choices: [],
+    },
+  ];
+  const addEmployeeQuestions = [
+    {
+      type: "input",
+      name: "first_name",
+      message: "What is employee's first name?",
+    },
+    {
+      type: "input",
+      name: "last_name",
+      message: "What is employee's last name?",
+    },
+    {
+      type: "list",
+      name: "role_id",
+      message: "What is employee's role?",
+      choices: [],
+    },
+    {
+      type: "list",
+      name: "manager_id",
+      message: "Who's employee's manager?",
+      choices: [],
+    },
+  ];
