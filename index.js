@@ -5,9 +5,6 @@ const express = require("express");
 
 const app = express();
 
-
-
-
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
@@ -39,7 +36,7 @@ const menuOptions = [
     "Exit",
   ];
 
-  const menuQuestions = [
+  const menuPrompts = [
     {
       type: "list",
       name: "choice",
@@ -48,7 +45,7 @@ const menuOptions = [
     },
   ];
 
-  const addRoleQuestions = [
+  const addRolePrompts = [
     { type: "input", name: "name", message: "What is role name?" },
     { type: "input", name: "salary", message: "What is role salary?" },
     {
@@ -58,7 +55,7 @@ const menuOptions = [
       choices: [],
     },
   ];
-  const addEmployeeQuestions = [
+  const addEmployeePrompts = [
     {
       type: "input",
       name: "first_name",
@@ -73,12 +70,54 @@ const menuOptions = [
       type: "list",
       name: "role_id",
       message: "What is employee's role?",
-      choices: [],
+      choices: allRoles,
     },
     {
       type: "list",
       name: "manager_id",
       message: "Who's employee's manager?",
       choices: [],
+    },
+  ];
+
+  const deleteEmployeePrompts = [
+    {
+      type: "list",
+      name: "chosenOption",
+      message: "Which employee would you like to delete?",
+      choices: allManagers,
+    },
+  ];
+  const deleteRolePrompts = [
+    {
+      type: "list",
+      name: "chosenOption",
+      message: "Which role would you like to delete?",
+      choices: allRoles,
+    },
+  ];
+  const deleteDepartmentPrompts = [
+    {
+      type: "list",
+      name: "chosenOption",
+      message: "Which department would you like to delete?",
+      choices: allDepartments,
+    },
+  ];
+
+  const viewManagerPrompts = [
+    {
+      type: "list",
+      name: "managerToBeViewed",
+      message: "Which manager would you like to view?",
+      choices: allManagers,
+    },
+  ];
+  const viewDepartmentPrompts = [
+    {
+      type: "list",
+      name: "departmentToBeViewed",
+      message: "Which department would you like to view?",
+      choices: allDepartments,
     },
   ];
