@@ -156,7 +156,7 @@ async function init() {
   const db = await mysql.createConnection({
     host: "127.0.0.1",
     user: "root",
-    password: "",
+    password: "aleks1981",
     database: "employeeTrackerDB",
   });
 
