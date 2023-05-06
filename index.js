@@ -66,6 +66,14 @@ const addEmployeePrompts = [
   },
 ];
 
+const addDepartmentPrompts = [
+  {
+    type: "input",
+    name: "department_name",
+    message: "What is the department name",
+  },
+];
+
 let managers = [];
 const deleteEmployeePrompts = [
   {
@@ -114,8 +122,29 @@ async function viewAllEmployees(db) {
   const [rows, field] = await db.execute("SELECT * from employee");
   console.table(rows);
 }
+
+async function addEmployee(db) {
+  const newEmployee = await inquirer.prompt(addEmployeePrompts);
+  console.log(newEmployee);
+}
+async function addRole(db) {
+  const newRole = await inquirer.prompt(addRolePrompts);
+  console.log(newRole);
+}
+async function addDepartment(db) {
+  const newDepartment = await inquirer.prompt(addDepartmentPrompts);
+  console.log(newDepartment);
+  await db.execute(`INSERT INTO department (name) VALUES ('${newDepartment.department_name}');`)
+}
+
 async function viewAllRoles(db) {
   const [rows, field] = await db.execute("SELECT * from role");
+  await rows.forEach(async (element) => {
+    const [departs, field] = await db.execute(
+      `SELECT * from department where id = '${element.department_id}'`
+    );
+    element.department_id = departs[0].name;
+  });
   console.table(rows);
 }
 async function viewAllDepartments(db) {
@@ -137,7 +166,7 @@ async function init() {
       await viewAllEmployees(db);
       break;
     case menuOptions[1]:
-      console.log(menuOptions[1]);
+      await addEmployee(db);
       break;
     case menuOptions[2]:
       console.log(menuOptions[2]);
@@ -146,13 +175,13 @@ async function init() {
       await viewAllRoles(db);
       break;
     case menuOptions[4]:
-      console.log(menuOptions[4]);
+      await addRole(db);
       break;
     case menuOptions[5]:
       await viewAllDepartments(db);
       break;
     case menuOptions[6]:
-      console.log(menuOptions[6]);
+      await addDepartment(db);
       break;
     case menuOptions[7]:
       console.log(menuOptions[7]);
