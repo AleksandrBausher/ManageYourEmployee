@@ -29,43 +29,6 @@ const menuPrompts = [
   },
 ];
 
-const addRolePrompts = [
-  { type: "input", name: "name", message: "What is role name?" },
-  { type: "input", name: "salary", message: "What is role salary?" },
-  {
-    type: "list",
-    name: "department_id",
-    message: "Which department?",
-    choices: [],
-  },
-];
-
-let roles = [];
-const addEmployeePrompts = [
-  {
-    type: "input",
-    name: "first_name",
-    message: "What is employee's first name?",
-  },
-  {
-    type: "input",
-    name: "last_name",
-    message: "What is employee's last name?",
-  },
-  {
-    type: "list",
-    name: "role_id",
-    message: "What is employee's role?",
-    choices: roles,
-  },
-  {
-    type: "list",
-    name: "manager_id",
-    message: "Who's employee's manager?",
-    choices: [],
-  },
-];
-
 const addDepartmentPrompts = [
   {
     type: "input",
@@ -74,13 +37,12 @@ const addDepartmentPrompts = [
   },
 ];
 
-let managers = [];
 const deleteEmployeePrompts = [
   {
     type: "list",
     name: "chosenOption",
     message: "Which employee would you like to delete?",
-    choices: managers,
+    choices: [],
   },
 ];
 const deleteRolePrompts = [
@@ -88,16 +50,15 @@ const deleteRolePrompts = [
     type: "list",
     name: "chosenOption",
     message: "Which role would you like to delete?",
-    choices: roles,
+    choices: [],
   },
 ];
-let departments = [];
 const deleteDepartmentPrompts = [
   {
     type: "list",
     name: "chosenOption",
     message: "Which department would you like to delete?",
-    choices: departments,
+    choices: [],
   },
 ];
 
@@ -106,7 +67,7 @@ const viewManagerPrompts = [
     type: "list",
     name: "managerToBeViewed",
     message: "Which manager would you like to view?",
-    choices: managers,
+    choices: [],
   },
 ];
 const viewDepartmentPrompts = [
@@ -114,7 +75,7 @@ const viewDepartmentPrompts = [
     type: "list",
     name: "departmentToBeViewed",
     message: "Which department would you like to view?",
-    choices: departments,
+    choices: [],
   },
 ];
 
@@ -124,27 +85,86 @@ async function viewAllEmployees(db) {
 }
 
 async function addEmployee(db) {
+  const [managers, m] = await db.execute("SELECT * FROM employee");
+  const [roles, r] = await db.execute("SELECT * FROM role");
+  roles.forEach((element) => {
+    element.value = element.id;
+    element.name = element.title;
+  });
+  managers.forEach((element) => {
+    element.value = element.id;
+    element.name = element.first_name + " " + element.last_name;
+  });
+  const addEmployeePrompts = [
+    {
+      type: "input",
+      name: "first_name",
+      message: "What is employee's first name?",
+    },
+    {
+      type: "input",
+      name: "last_name",
+      message: "What is employee's last name?",
+    },
+    {
+      type: "list",
+      name: "role_id",
+      message: "What is employee's role?",
+      choices: roles,
+    },
+    {
+      type: "list",
+      name: "manager_id",
+      message: "Who's employee's manager?",
+      choices: managers,
+    },
+  ];
   const newEmployee = await inquirer.prompt(addEmployeePrompts);
-  console.log(newEmployee);
+  await db.execute(
+    `INSERT INTO employee ( first_name, last_name, role_id, manager_id) VALUES ("${newEmployee.first_name}","${newEmployee.last_name}",${newEmployee.role_id},${newEmployee.manager_id});`
+  );
+  console.log(`Employee ${newEmployee.first_name+" "+newEmployee.last_name} added to Database`);
 }
 async function addRole(db) {
+  const [departments, d] = await db.execute("SELECT * FROM department");
+  departments.forEach((element) => {
+    element.value = element.id;
+  });
+  const addRolePrompts = [
+    { type: "input", name: "name", message: "What is role name?" },
+    { type: "input", name: "salary", message: "What is role salary?" },
+    {
+      type: "list",
+      name: "department_id",
+      message: "Which department?",
+      choices: departments,
+    },
+  ];
   const newRole = await inquirer.prompt(addRolePrompts);
-  console.log(newRole);
+  await db.execute(
+    `INSERT INTO role (title, salary, department_id) VALUES ("${newRole.name}",${newRole.salary},${newRole.department_id});`
+  );
+  console.log(`Role "${newRole.name}" added to Database`);
+
 }
 async function addDepartment(db) {
   const newDepartment = await inquirer.prompt(addDepartmentPrompts);
-  console.log(newDepartment);
-  await db.execute(`INSERT INTO department (name) VALUES ('${newDepartment.department_name}');`)
+  await db.execute(
+    `INSERT INTO department (name) VALUES ('${newDepartment.department_name}');`
+  );
+  console.log(`Department "${newDepartment.department_name}" added to Database`);
 }
 
 async function viewAllRoles(db) {
   const [rows, field] = await db.execute("SELECT * from role");
-  await rows.forEach(async (element) => {
+  rows.forEach(async function (element) {
     const [departs, field] = await db.execute(
       `SELECT * from department where id = '${element.department_id}'`
     );
-    element.department_id = departs[0].name;
+    element.department = departs[0].name;
+    delete element.department_id;
   });
+
   console.table(rows);
 }
 async function viewAllDepartments(db) {
@@ -156,7 +176,7 @@ async function init() {
   const db = await mysql.createConnection({
     host: "127.0.0.1",
     user: "root",
-    password: "aleks1981",
+    password: "",
     database: "employeeTrackerDB",
   });
 
